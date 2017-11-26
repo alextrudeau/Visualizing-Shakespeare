@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" >
+  <head>
+    <title>Visualizing Shakespeare</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="initial-scale=1" />
+
+    <!--CSS Stylesheets-->
+    <link rel='stylesheet' href="https://fonts.googleapis.com/css?family=Alegreya+SC|Open+Sans">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+    <link rel="stylesheet" href="./static/app.css">
+  </head>
+
+  <body ng-cloak ng-app="shakespeareApp" layout="column" ng-controller="AppController as ctrl">
+    <!--Toolbar-->
+    <md-toolbar layout="row">
+      <md-button class="menu" ng-show="ctrl.selected" ng-click="ctrl.toggleList($event)" aria-label="Show Play List">
+        <md-icon>menu</md-icon>
+      </md-button>
+      <md-button class="menu" ng-click="ctrl.viewHomePage()">
+                <md-icon>home</md-icon>
+      </md-button>
+      <h1 class="title">Visualizing Shakespeare</h1>
+    </md-toolbar>
+
+    <div flex layout="row">
+        <md-sidenav md-component-id='left' ng-click="ctrl.toggleList($event)" class="md-whiteframe-z2" >
+          <md-subheader class="nav-menu">
+            <md-menu style="padding-right:8px">
+              <md-button class="md-no-focus sort" ng-click="$mdOpenMenu($event)">
+                <md-icon>sort</md-icon>
+              </md-button>
+              <md-menu-content style="padding:0px">
+                <md-menu-item>
+                  <md-button aria-label="Sort by Title" ng-click="ctrl.sortList('name')">
+                    Sort by Title
+                  </md-button>
+                </md-menu-item>
+                <md-menu-item>
+                  <md-button aria-label="Sort by Date" ng-click="ctrl.sortList('year')">
+                    Sort by Year
+                  </md-button>
+                </md-menu-item>
+              </md-menu-content>
+            </md-menu>
+
+            <md-icon style="padding-right:8px">search</md-icon>
+            <input class="search-bar" ng-model="ctrl.searchTerm" type="text" placeholder="Search">
+          </md-subheader>
+          <md-list>
+            <md-list-item ng-repeat="item in ctrl.plays | filter:ctrl.searchTerm | orderBy:ctrl.sortBy">
+                <md-button style="padding-left:12px" ng-click="ctrl.selectPlay(item)" ng-class="{'selected': item === ctrl.selected }">
+                  <div layout="row">
+                    <div>{{item.name}}</div>
+                    <div ng-show="ctrl.showYears" style="padding-left:4px">({{item.year}})</div>
+                  </div>
+                </md-button>
+            </md-list-item>
+          </md-list>
+        </md-sidenav>
+
+        <!--Play content-->
+        <md-content style="overflow:scroll" flex id="content">
+        <div ng-view></div>
+        <!--<play-page ng-show="ctrl.selected" play="ctrl.selected" height="100%"></play-page>-->
+        <div ng-show="!ctrl.selected">
+            <div layout="row">
+              <md-card md-theme="default" md-theme-watch style="width:33%;display:inline-block">
+                <md-card-content>
+                  <h2>Comedies</h2>
+                  <div ng-repeat="item in ctrl.comedies">
+                        <div class="play-name" ng-click="ctrl.selectPlay(item)">{{item.name}}</div>
+                  </div>
+                </md-card-content>
+              </md-card>
+              <md-card md-theme="default" md-theme-watch style="width:33%;display:inline-block">
+                <md-card-content>
+                  <h2>Histories</h2>
+                   <div ng-repeat="item in ctrl.histories" layout="column">
+                        <div class="play-name" ng-click="ctrl.selectPlay(item)">{{item.name}}</div>
+                  </div>
+                </md-card-content>
+              </md-card>
+              <md-card md-theme="default" md-theme-watch style="width:33%;display:inline-block">
+                <md-card-content>
+                <h2>Tragedies</h2>
+                 <div ng-repeat="item in ctrl.tragedies" layout="column">
+                      <div class="play-name" ng-click="ctrl.selectPlay(item)">{{item.name}}</div>
+                </div>
+              </md-card-content>
+            </md-card>
+          </div>
+        </div>
+        </md-content>
+    </div>
+
+    <!-- Angular Dependencies -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+
+        <!--D3 Dependencies-->
+    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="//d3js.org/queue.v1.min.js"></script>
+
+    <!--App Dependencies-->
+
+    <script src="./static/visualizations/barGraph/barModule.js"></script>
+
+    <script src="./static/plays/PlayService.js"></script>
+    <script src="./static/plays/playModule.js"></script>
+    <script src="./static/plays/PlayController.js"></script>
+    <script src="./static/sides/sidesModule.js"></script>
+    <script src="./static/sides/sidesController.js"></script>
+    <script src="./static/visualizations/wordCloud/wordCloudModule.js"></script>
+    <script src="./static/visualizations/wordCloud/d3.layout.cloud.js"></script>
+    <script src="./static/navService.js"></script>
+    <script src="./static/app.js"></script>
+	<script src="./static/visualizations/speakChord/speakChordModule.js">
+	</script>
+    <script src="./static/visualizations/heatMap/heatMapModule.js"></script>
+    <script src="./static/visualizations/themeGraph/themeGraphModule.js"></script>
+    <script src="./static/visualizations/pieChart/pieChartModule.js"></script>
+	  
+	  
+  </body>
+</html>
